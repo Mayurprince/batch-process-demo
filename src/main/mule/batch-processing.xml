@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:batch="http://www.mulesoft.org/schema/mule/batch"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<file:config name="File_Config" doc:name="File Config" doc:id="4a5f05e1-6823-44b7-a1fb-0812707d7332" >
+	</file:config>
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="38e29727-3027-441b-86cb-c7cba97c8d93" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<file:config name="File_Config_03" doc:name="File Config" doc:id="b768a593-7278-4c1e-b374-0ebd4b2f09c3" />
+	<file:config name="File_Config_02" doc:name="File Config" doc:id="f7d92f44-3178-4225-848d-179c97dae846" />
+	<flow name="batch-processingFlow" doc:id="7c807cf2-1f28-4b3b-8e63-0b4cfcbf0ed9" >
+		<scheduler doc:name="Scheduler for BMW Input" doc:id="0f8fa94c-7d7e-48a4-97f4-78ae086921d8" >
+			<scheduling-strategy >
+				<fixed-frequency frequency="5" timeUnit="MINUTES"/>
+			</scheduling-strategy>
+		</scheduler>
+		<logger level="INFO" doc:name="Getting Mule Home Address" doc:id="f164c8da-0216-4bee-b2e8-793b17ad46c6" message="#[mule.home]"/>
+		<file:read doc:id="c3c6c17d-8ee4-4cb7-91c0-4a0d31960900" path="C:\Users\mules\Desktop\Mayur Mulesoft Architecture\BMW.json" config-ref="File_Config" doc:name="Reading BMW Input payload"/>
+		<batch:job jobName="BMW-batch-processing" doc:id="04e90c9a-0daa-437a-b2be-f07c8603de05" blockSize="5" maxFailedRecords="-1">
+			<batch:process-records >
+				<batch:step name="Batch_Step-01" doc:id="aa2a29a2-b5a4-4a41-a4f9-c1af8a6ee194" acceptPolicy="ALL">
+					<logger level="INFO" doc:name="Counters" doc:id="8860fc32-d64b-4be8-9c86-2379189578a9" message="Counters"/>
+					<ee:transform doc:name="Printing Payload" doc:id="7ce18cd3-932e-4ed5-aca5-779862aa2eb4" >
+						<ee:message >
+							<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"Year" : payload.year as Number,
+	"Model" : payload.model
+}]]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+					<batch:aggregator doc:name="Batch Aggregator" doc:id="4b39a18e-1a23-43e6-b534-8e936b2939f6" streaming="true" preserveMimeTypes="true">
+						<logger level="INFO" doc:name="Batch Aggregated" doc:id="a4fd3711-9d59-4812-b95e-8214cbf6531d" message="Batch Aggregated 01"/>
+						<file:write doc:name="Writing Aggregated successed BMW details" doc:id="154a4df4-8f5f-4185-985f-5f9799f9b6ea" path="#['C:\Users\mules\Desktop\Mayur Mulesoft Architecture\Success.json']" config-ref="File_Config_02" mode="APPEND">
+							<file:content ><![CDATA[#[output application/json --- payload]]]></file:content>
+						</file:write>
+					</batch:aggregator>
+				</batch:step>
+				<batch:step name="Batch_Step-02" doc:id="f3a1e8da-8a4a-4a16-a9d2-a7ddc3d6a73e" acceptPolicy="ALL">
+					<logger level="INFO" doc:name="Failed-Records" doc:id="b4d7808f-b01f-4cb2-a97b-5d74e9a5cc78" message="Failed-Records"/>
+					<ee:transform doc:name="Transform Message" doc:id="331ecab2-e0ee-47e7-867d-fc4f32a593f3" >
+						<ee:message >
+							<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"Year" : payload.year,
+	"Model" : payload.model
+}]]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+					<batch:aggregator doc:name="Batch Aggregator" doc:id="31f06acf-d912-4301-880e-d1393d0d9b2d" streaming="true" preserveMimeTypes="true">
+						<logger level="INFO" doc:name="Batch Aggregated" doc:id="61ea5eae-e687-4e63-8e48-f76b0b4a53f3" message="Batch Aggregated 02"/>
+						<file:write doc:name="Writing Aggregated Falied BMW Records" doc:id="e57ebcb9-3309-430d-9996-efe2dbc2fc32" path="#['C:\Users\mules\Desktop\Mayur Mulesoft Architecture\Error.json']" mode="APPEND" config-ref="File_Config_03">
+							<file:content ><![CDATA[#[output application/json --- payload]]]></file:content>
+						</file:write>
+					</batch:aggregator>
+				</batch:step>
+			</batch:process-records>
+			<batch:on-complete >
+				<logger level="INFO" doc:name="Completed Process" doc:id="38e4eba8-ecd9-4bcb-a2a6-54fb827bae6a" message="Completed Process"/>
+				<logger level="INFO" doc:name="Logging Payload" doc:id="2de2c51d-bd53-45c7-9fe1-54bef72ef45f" message="#[payload]"/>
+				<ee:transform doc:name="Printing Payload" doc:id="0e428246-20d2-486a-a1ea-0dcc6f064e03" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</batch:on-complete>
+		</batch:job>
+	</flow>
+	<flow name="batch-processingFlow1" doc:id="72ed2a2c-4061-4cb0-ad4b-4ff46d2f5cc5" >
+		<http:listener doc:name="Listener" doc:id="0b4bbc9d-28a3-47a5-a1ba-ec7b9828ff45" config-ref="HTTP_Listener_config" path="/batchjob"/>
+		<flow-ref doc:name="Flow Reference" doc:id="a0eef735-fb1d-4c1c-80e7-6e4273274b41" name="batch-processingFlow"/>
+		<ee:transform doc:name="Transform Message" doc:id="108a7989-e814-4b59-80ad-4d1b6d63073e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

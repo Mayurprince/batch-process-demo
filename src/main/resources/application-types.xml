@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="BMWPayload" format="json">
+      <types:shape format="weave" example="examples/BMW.json"><![CDATA[%dw 2.0
+
+type BMWPayload = Array<{|  model: String,   year: String,   price: String,   transmission: String,   mileage: String,   fuelType: String,   tax: String,   mpg: String,   engineSize: String|}> {"example": "[{\\\"model\\\":\\\" 5 Series\\\",\\\"year\\\":\\\"2014\\\",\\\"price\\\":\\\"11200\\\",\\\"transmission\\\":\\\"Automatic\\\",\\\"mileage\\\":\\\"67068\\\",\\\"fuelType\\\":\\\"Diesel\\\",\\\"tax\\\":\\\"125\\\",\\\"mpg\\\":\\\"57.6\\\",\\\"engineSize\\\":\\\"2.0\\\"},{\\\"model\\\":\\\" 6 Series\\\",\\\"year\\\":\\\"2018\\\",\\\"price\\\":\\\"27000\\\",\\\"transmission\\\":\\\"Automatic\\\",\\\"mileage\\\":\\\"14827\\\",\\\"fuelType\\\":\\\"Petrol\\\",\\\"tax\\\":\\\"145\\\",\\\"mpg\\\":\\\"42.8\\\",\\\"engineSize\\\":\\\"2.0\\\"},{\\\"model\\\":\\\" 5 Series\\\",\\\"year\\\":\\\"2016\\\",\\\"price\\\":\\\"16000\\\",\\\"transmission\\\":\\\"Automatic\\\",\\\"mileage\\\":\\\"62794\\\",\\\"fuelType\\\":\\\"Diesel\\\",\\\"tax\\\":\\\"160\\\",\\\"mpg\\\":\\\"51.4\\\",\\\"engineSize\\\":\\\"3.0\\\"},{\\\"model\\\":\\\" 1 Series\\\",\\\"year\\\":\\\"2017\\\",\\\"price\\\":\\\"12750\\\",\\\"transmission\\\":\\\"Automatic\\\",\\\"mileage\\\":\\\"26676\\\",\\\"fuelType\\\":\\\"Diesel\\\",\\\"tax\\\":\\\"145\\\",\\\"mpg\\\":\\\"72.4\\\",\\\"engineSize\\\":\\\"1.5\\\"},{\\\"model\\\":\\\" 7 Series\\\",\\\"year\\\":\\\"2014\\\",\\\"price\\\":\\\"14500\\\",\\\"transmission\\\":\\\"Automatic\\\",\\\"mileage\\\":\\\"39554\\\",\\\"fuelType\\\":\\\"Diesel\\\",\\\"tax\\\":\\\"160\\\",\\\"mpg\\\":\\\"50.4\\\",\\\"engineSize\\\":\\\"3.0\\\"},{\\\"model\\\":\\\" 5 Series\\\",\\\"year\\\":\\\"2016\\\",\\\"price\\\":\\\"14900\\\",\\\"transmission\\\":\\\"Automatic\\\",\\\"mileage\\\":\\\"35309\\\",\\\"fuelType\\\":\\\"Diesel\\\",\\\"tax\\\":\\\"125\\\",\\\"mpg\\\":\\\"60.1\\\",\\\"engineSize\\\":\\\"2.0\\\"},{\\\"model\\\":\\\" 5 Series\\\",\\\"year\\\":\\\"2017\\\",\\\"price\\\":\\\"16000\\\",\\\"transmission\\\":\\\"Automatic\\\",\\\"mileage\\\":\\\"38538\\\",\\\"fuelType\\\":\\\"Diesel\\\",\\\"tax\\\":\\\"125\\\",\\\"mpg\\\":\\\"60.1\\\",\\\"engineSize\\\":\\\"2.0\\\"},{\\\"model\\\":\\\" 2 Series\\\",\\\"year\\\":\\\"2018\\\",\\\"price\\\":\\\"16250\\\",\\\"transmission\\\":\\\"Manual\\\",\\\"mileage\\\":\\\"10401\\\",\\\"fuelType\\\":\\\"Petrol\\\",\\\"tax\\\":\\\"145\\\",\\\"mpg\\\":\\\"52.3\\\",\\\"engineSize\\\":\\\"1.5\\\"},{\\\"model\\\":\\\" 4 Series\\\",\\\"year\\\":\\\"2017\\\",\\\"price\\\":\\\"14250\\\",\\\"transmission\\\":\\\"Manual\\\",\\\"mileage\\\":\\\"42668\\\",\\\"fuelType\\\":\\\"Diesel\\\",\\\"tax\\\":\\\"30\\\",\\\"mpg\\\":\\\"62.8\\\",\\\"engineSize\\\":\\\"2.0\\\"},{\\\"model\\\":\\\" 5 Series\\\",\\\"year\\\":\\\"2016\\\",\\\"price\\\":\\\"14250\\\",\\\"transmission\\\":\\\"Automatic\\\",\\\"mileage\\\":\\\"36099\\\",\\\"fuelType\\\":\\\"Diesel\\\",\\\"tax\\\":\\\"20\\\",\\\"mpg\\\":\\\"68.9\\\",\\\"engineSize\\\":\\\"2.0\\\"}]"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#7ce18cd3-932e-4ed5-aca5-779862aa2eb4">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="BMWPayload"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#331ecab2-e0ee-47e7-867d-fc4f32a593f3">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="BMWPayload"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>
